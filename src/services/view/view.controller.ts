@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 
 @Controller('views')
-export class ViewsController {
+export class ViewController {
   constructor() {}
 
   @Get()
