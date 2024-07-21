@@ -9,4 +9,8 @@ export class ViewService {
   async findAll(): Promise<ViewEntity> {
     return await this.viewRepository.findAll();
   }
+
+  async addView(id: number): Promise<ViewEntity> {
+    return await this.viewRepository.addView(id);
+  }
 }
