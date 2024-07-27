@@ -12,6 +12,7 @@ import { HistoryModule } from './services/history/history.module';
 import { HistoryController } from './services/history/history.controller';
 import { HistoryEntity } from './models/entities/history.entity';
 import { ConfigModule } from '@nestjs/config';
+import { HealthCheckModule } from './services/healthCheck/healthCheck.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ConfigModule } from '@nestjs/config';
     }), // * COnfig database
     ViewsModule,
     HistoryModule,
+    HealthCheckModule,
   ],
   controllers: [],
 })

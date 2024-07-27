@@ -1,15 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
-import { HistoryService } from './services/history/history.service';
+import { HistoryService } from '../history/history.service';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('AppController')
-@Controller('app')
-export class AppController {
+@ApiTags('HealthCheckController')
+@Controller('healthCheck')
+export class HealthCheckController {
   constructor(private readonly historyService: HistoryService) {}
 
-  @Get('/healthCheck')
-  async getHello(): Promise<{
+  @Get()
+  async healthCheck(): Promise<{
     databaseConnected: boolean;
     status: boolean;
   }> {
