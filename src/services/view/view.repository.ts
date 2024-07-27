@@ -27,16 +27,33 @@ export class ViewRepository {
     });
   }
 
-  async addView(id: number): Promise<ViewEntity> {
-    const view = await this.findById(id);
+  async findName(name: string): Promise<ViewEntity> {
+    return await this.db.getRepository(ViewEntity).findOne({
+      select: {
+        id: true,
+        name: true,
+        view: true,
+        create_on: true,
+        update_on: true,
+      },
+      where: { name: name },
+    });
+  }
+
+  async addView(name: string): Promise<ViewEntity> {
+    const view = await this.findName(name);
 
     if (!view) {
-      throw new Error('View not found');
+      return await this.db.getRepository(ViewEntity).save({
+        name: name,
+        view: 1,
+        create_on: new Date(),
+        update_on: new Date(),
+      });
     }
 
     view.view += 1;
     view.update_on = new Date();
-    await this.db.getRepository(ViewEntity).save(view);
-    return view;
+    return await this.db.getRepository(ViewEntity).save(view);
   }
 }

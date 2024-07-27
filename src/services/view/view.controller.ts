@@ -12,8 +12,8 @@ export class ViewController {
     return await this.viewService.findAll();
   }
 
-  @Patch('/:id')
-  async AddView(@Param('id') id: string): Promise<ViewEntity> {
-    return await this.viewService.addView(+id);
+  @Patch('/:name')
+  async AddView(@Param('name') name: string): Promise<ViewEntity> {
+    return await this.viewService.addView(name);
   }
 }

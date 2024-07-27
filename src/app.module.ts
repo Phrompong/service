@@ -11,16 +11,18 @@ import { ViewEntity } from './models/entities/view.entity';
 import { HistoryModule } from './services/history/history.module';
 import { HistoryController } from './services/history/history.controller';
 import { HistoryEntity } from './models/entities/history.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ envFilePath: '.production.env' }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5433,
-      username: 'admin',
-      password: 'password',
-      database: 'jaew_db',
+      host: process.env.DATABASE_HOST,
+      port: +process.env.DATABASE_PORT,
+      username: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE_NAME,
       entities: [ViewEntity, HistoryEntity],
       synchronize: true,
     }), // * COnfig database
