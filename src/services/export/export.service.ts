@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Font, Workbook } from 'exceljs';
+import { Font, Workbook, Worksheet } from 'exceljs';
+import { startOfMonth, endOfMonth, eachDayOfInterval, format } from 'date-fns';
 
 @Injectable()
 export class ExportService {
@@ -7,7 +8,7 @@ export class ExportService {
 
   async timeSheet(): Promise<any> {
     const workbook = new Workbook();
-    const worksheet = workbook.addWorksheet('TimeSheet');
+    let worksheet = workbook.addWorksheet('TimeSheet');
 
     workbook.title = 'TimeSheet';
 
@@ -128,15 +129,151 @@ export class ExportService {
 
     //#endregion
 
-    // * Detail row 5 - 41
-    worksheet.getCell('A6').border = {
+    //#region Header Date
+    const dateNow = new Date();
+
+    await this.generateDetail(worksheet, {
+      column: 'A',
+      columnTitle: 'Date',
+      data: this.generateDate(dateNow),
+    });
+
+    await this.generateDetail(worksheet, {
+      column: 'B',
+      columnTitle: 'Day',
+      data: this.generateDay(dateNow),
+    });
+    // worksheet.mergeCells('A5:A6');
+    // worksheet.getCell(`A5`).value = 'Date';
+    // worksheet.getCell(`A5`).alignment = {
+    //   vertical: 'middle',
+    //   horizontal: 'center',
+    // };
+    // worksheet.getCell(`A5`).font = {
+    //   name: fontNamePI,
+    //   size: fontSizePI,
+    //   bold: true,
+    // };
+    // worksheet.getCell(`A5`).border = {
+    //   top: { style: 'thin' },
+    //   left: { style: 'thin' },
+    //   bottom: { style: 'thin' },
+    //   right: { style: 'thin' },
+    // };
+
+    // //TODO change month
+    // let day = 1;
+    // for (let i = 7; i <= 6 + 30; i++) {
+    //   worksheet.getCell(`A${i}`).border = {
+    //     top: { style: 'thin' },
+    //     left: { style: 'thin' },
+    //     bottom: { style: 'thin' },
+    //     right: { style: 'thin' },
+    //   };
+
+    //   worksheet.getCell(`A${i}`).value = day++;
+
+    //   worksheet.getCell(`A${i}`).font = {
+    //     name: fontNamePI,
+    //     size: fontSizePI,
+    //   };
+
+    //   worksheet.getCell(`A${i}`).alignment = {
+    //     vertical: 'middle',
+    //     horizontal: 'center',
+    //   };
+    // }
+    //#endregion
+
+    //#region Header Day
+    // worksheet.mergeCells('B5:B6');
+    // worksheet.getCell(`B5`).value = 'Day';
+    // worksheet.getCell(`B5`).alignment = {
+    //   vertical: 'middle',
+    //   horizontal: 'center',
+    // };
+    // worksheet.getCell(`B5`).font = {
+    //   name: fontNamePI,
+    //   size: fontSizePI,
+    //   bold: true,
+    // };
+    // worksheet.getCell(`B5`).border = {
+    //   top: { style: 'thin' },
+    //   left: { style: 'thin' },
+    //   bottom: { style: 'thin' },
+    //   right: { style: 'thin' },
+    // };
+
+    //#endregion
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
+  }
+
+  private async generateDetail(
+    worksheet: any,
+    setting: { column: string; columnTitle: string; data: any[] },
+  ): Promise<Worksheet> {
+    const { column, columnTitle, data } = setting;
+
+    if (!column || !data) throw new Error('Invalid column or data');
+
+    worksheet.mergeCells(`${column}5:${column}6`);
+    worksheet.getCell(`${column}5`).value = columnTitle;
+    worksheet.getCell(`${column}5`).alignment = {
+      vertical: 'middle',
+      horizontal: 'center',
+    };
+    worksheet.getCell(`${column}5`).font = {
+      size: 12,
+      bold: true,
+    };
+    worksheet.getCell(`$${column}5`).border = {
       top: { style: 'thin' },
       left: { style: 'thin' },
       bottom: { style: 'thin' },
       right: { style: 'thin' },
     };
 
-    const buffer = await workbook.xlsx.writeBuffer();
-    return buffer;
+    let index = 0;
+    for (let i = 7; i <= 6 + data.length; i++) {
+      worksheet.getCell(`${column}${i}`).border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+
+      worksheet.getCell(`${column}${i}`).value = data[index++];
+
+      worksheet.getCell(`${column}${i}`).font = {
+        size: 10,
+      };
+
+      worksheet.getCell(`${column}${i}`).alignment = {
+        vertical: 'middle',
+        horizontal: 'center',
+      };
+    }
+
+    return worksheet;
+  }
+
+  private generateDate(dateNow: Date): number[] {
+    const daysOfWeek = eachDayOfInterval({
+      start: startOfMonth(dateNow),
+      end: endOfMonth(dateNow),
+    });
+
+    return daysOfWeek.map((day) => day.getDate());
+  }
+
+  private generateDay(dateNow: Date): string[] {
+    const daysOfWeek = eachDayOfInterval({
+      start: startOfMonth(dateNow),
+      end: endOfMonth(dateNow),
+    });
+
+    return daysOfWeek.map((day) => format(day, 'EEE'));
   }
 }
