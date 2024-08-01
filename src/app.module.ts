@@ -13,10 +13,12 @@ import { HistoryController } from './services/history/history.controller';
 import { HistoryEntity } from './models/entities/history.entity';
 import { ConfigModule } from '@nestjs/config';
 import { HealthCheckModule } from './services/healthCheck/healthCheck.module';
+import { ExportController } from './services/export/export.controller';
+import { ExportModule } from './services/export/export.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: '.production.env' }),
+    ConfigModule.forRoot({ envFilePath: '.development.env' }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DATABASE_HOST,
@@ -26,11 +28,11 @@ import { HealthCheckModule } from './services/healthCheck/healthCheck.module';
       database: process.env.DATABASE_NAME,
       entities: [ViewEntity, HistoryEntity],
       synchronize: true,
-    }), // * COnfig database
+    }), // * Config database
     ViewsModule,
     HistoryModule,
     HealthCheckModule,
+    ExportModule,
   ],
-  controllers: [],
 })
 export class AppModule {}
