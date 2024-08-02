@@ -239,6 +239,69 @@ export class ExportService {
 
     //#endregion
 
+    //#region Column For payroll
+    worksheet.mergeCells('G5:I5');
+    worksheet.getCell('G5').value = 'FOR PAYROLL';
+    this.style(worksheet, {
+      column: 'G5',
+      alignment: true,
+      font: true,
+      border: true,
+      bold: true,
+    });
+
+    worksheet.getCell('G6').value = '1';
+    this.style(worksheet, {
+      column: 'G6',
+      alignment: true,
+      font: true,
+      border: true,
+      bold: true,
+    });
+
+    worksheet.getCell('H6').value = '1.5';
+    this.style(worksheet, {
+      column: 'H6',
+      alignment: true,
+      font: true,
+      border: true,
+      bold: true,
+    });
+
+    worksheet.getCell('I6').value = '3';
+    this.style(worksheet, {
+      column: 'I6',
+      alignment: true,
+      font: true,
+      border: true,
+      bold: true,
+    });
+
+    // * Column 1
+    this.generateDetail(worksheet, {
+      column: 'G',
+      columnTitle: '1',
+      data: this.generateOvertime(dateNow),
+      isBgColor: true,
+    });
+
+    // * Column 1.5
+    this.generateDetail(worksheet, {
+      column: 'H',
+      columnTitle: '1.5',
+      data: this.generateOvertime(dateNow),
+      isBgColor: true,
+    });
+
+    // * Column 3
+    this.generateDetail(worksheet, {
+      column: 'I',
+      columnTitle: '3',
+      data: this.generateOvertime(dateNow),
+      isBgColor: true,
+    });
+    //#endregion
+
     //#endregion
 
     const buffer = await workbook.xlsx.writeBuffer();
@@ -252,9 +315,10 @@ export class ExportService {
       columnTitle: string;
       data: any[];
       isMerge?: boolean;
+      isBgColor?: boolean;
     },
   ): Promise<Worksheet> {
-    const { column, columnTitle, data, isMerge } = setting;
+    const { column, columnTitle, data, isMerge, isBgColor } = setting;
 
     if (!column || !data) throw new Error('Invalid column or data');
 
@@ -296,6 +360,14 @@ export class ExportService {
         vertical: 'middle',
         horizontal: 'center',
       };
+
+      if (isBgColor) {
+        worksheet.getCell(`${column}${i}`).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FF808080' },
+        };
+      }
     }
 
     return worksheet;
