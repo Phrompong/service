@@ -129,82 +129,67 @@ export class ExportService {
 
     //#endregion
 
-    //#region Header Date
+    //#region Table detail
     const dateNow = new Date();
 
+    // * Column Date
     await this.generateDetail(worksheet, {
       column: 'A',
       columnTitle: 'Date',
       data: this.generateDate(dateNow),
+      isMerge: true,
     });
 
+    // * Column Day
     await this.generateDetail(worksheet, {
       column: 'B',
       columnTitle: 'Day',
       data: this.generateDay(dateNow),
+      isMerge: true,
     });
-    // worksheet.mergeCells('A5:A6');
-    // worksheet.getCell(`A5`).value = 'Date';
-    // worksheet.getCell(`A5`).alignment = {
-    //   vertical: 'middle',
-    //   horizontal: 'center',
-    // };
-    // worksheet.getCell(`A5`).font = {
-    //   name: fontNamePI,
-    //   size: fontSizePI,
-    //   bold: true,
-    // };
-    // worksheet.getCell(`A5`).border = {
-    //   top: { style: 'thin' },
-    //   left: { style: 'thin' },
-    //   bottom: { style: 'thin' },
-    //   right: { style: 'thin' },
-    // };
 
-    // //TODO change month
-    // let day = 1;
-    // for (let i = 7; i <= 6 + 30; i++) {
-    //   worksheet.getCell(`A${i}`).border = {
-    //     top: { style: 'thin' },
-    //     left: { style: 'thin' },
-    //     bottom: { style: 'thin' },
-    //     right: { style: 'thin' },
-    //   };
+    // * Column Working Time
+    worksheet.mergeCells('C5:D5');
+    worksheet.getCell('C5').value = 'Working Time';
+    this.style(worksheet, {
+      column: 'C5',
+      alignment: true,
+      font: true,
+      border: true,
+      bold: true,
+    });
 
-    //   worksheet.getCell(`A${i}`).value = day++;
+    worksheet.getCell('C6').value = 'From';
+    this.style(worksheet, {
+      column: 'C6',
+      alignment: true,
+      font: true,
+      border: true,
+      bold: true,
+    });
 
-    //   worksheet.getCell(`A${i}`).font = {
-    //     name: fontNamePI,
-    //     size: fontSizePI,
-    //   };
+    worksheet.getCell('D6').value = 'To';
+    this.style(worksheet, {
+      column: 'D6',
+      alignment: true,
+      font: true,
+      border: true,
+      bold: true,
+    });
 
-    //   worksheet.getCell(`A${i}`).alignment = {
-    //     vertical: 'middle',
-    //     horizontal: 'center',
-    //   };
-    // }
-    //#endregion
+    // * Column from
+    await this.generateDetail(worksheet, {
+      column: 'C',
+      columnTitle: 'From',
+      data: this.generateWorkingTimeForm(dateNow),
+    });
 
-    //#region Header Day
-    // worksheet.mergeCells('B5:B6');
-    // worksheet.getCell(`B5`).value = 'Day';
-    // worksheet.getCell(`B5`).alignment = {
-    //   vertical: 'middle',
-    //   horizontal: 'center',
-    // };
-    // worksheet.getCell(`B5`).font = {
-    //   name: fontNamePI,
-    //   size: fontSizePI,
-    //   bold: true,
-    // };
-    // worksheet.getCell(`B5`).border = {
-    //   top: { style: 'thin' },
-    //   left: { style: 'thin' },
-    //   bottom: { style: 'thin' },
-    //   right: { style: 'thin' },
-    // };
-
-    //#endregion
+    // * Column to
+    await this.generateDetail(worksheet, {
+      column: 'D',
+      columnTitle: 'To',
+      data: this.generateWorkingTimeTo(dateNow),
+    });
 
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
@@ -212,28 +197,35 @@ export class ExportService {
 
   private async generateDetail(
     worksheet: any,
-    setting: { column: string; columnTitle: string; data: any[] },
+    setting: {
+      column: string;
+      columnTitle: string;
+      data: any[];
+      isMerge?: boolean;
+    },
   ): Promise<Worksheet> {
-    const { column, columnTitle, data } = setting;
+    const { column, columnTitle, data, isMerge } = setting;
 
     if (!column || !data) throw new Error('Invalid column or data');
 
-    worksheet.mergeCells(`${column}5:${column}6`);
-    worksheet.getCell(`${column}5`).value = columnTitle;
-    worksheet.getCell(`${column}5`).alignment = {
-      vertical: 'middle',
-      horizontal: 'center',
-    };
-    worksheet.getCell(`${column}5`).font = {
-      size: 12,
-      bold: true,
-    };
-    worksheet.getCell(`$${column}5`).border = {
-      top: { style: 'thin' },
-      left: { style: 'thin' },
-      bottom: { style: 'thin' },
-      right: { style: 'thin' },
-    };
+    if (isMerge == true) {
+      worksheet.mergeCells(`${column}5:${column}6`);
+      worksheet.getCell(`${column}5`).value = columnTitle;
+      worksheet.getCell(`${column}5`).alignment = {
+        vertical: 'middle',
+        horizontal: 'center',
+      };
+      worksheet.getCell(`${column}5`).font = {
+        size: 12,
+        bold: true,
+      };
+      worksheet.getCell(`$${column}5`).border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    }
 
     let index = 0;
     for (let i = 7; i <= 6 + data.length; i++) {
@@ -275,5 +267,60 @@ export class ExportService {
     });
 
     return daysOfWeek.map((day) => format(day, 'EEE'));
+  }
+
+  private generateWorkingTimeForm(dateNow: Date): string[] {
+    const day = this.generateDay(dateNow);
+
+    return day.map((o) => {
+      if (o === 'Sat' || o === 'Sun') return '';
+      return '08:00';
+    });
+  }
+
+  private generateWorkingTimeTo(dateNow: Date): string[] {
+    const day = this.generateDay(dateNow);
+
+    return day.map((o) => {
+      if (o === 'Sat' || o === 'Sun') return '';
+      return '17:00';
+    });
+  }
+
+  private style(
+    worksheet: Worksheet,
+    setting: {
+      column: string;
+      bold?: boolean;
+      border?: boolean;
+      font?: boolean;
+      alignment?: boolean;
+    },
+  ) {
+    const { bold, border, font, alignment, column } = setting;
+
+    if (border) {
+      worksheet.getCell(column).border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    }
+
+    if (font) {
+      worksheet.getCell(column).font = {
+        name: 'Arial',
+        size: 12,
+        bold: bold,
+      };
+    }
+
+    if (alignment) {
+      worksheet.getCell(column).alignment = {
+        vertical: 'middle',
+        horizontal: 'center',
+      };
+    }
   }
 }
