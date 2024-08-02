@@ -133,7 +133,7 @@ export class ExportService {
     const dateNow = new Date();
 
     // * Column Date
-    await this.generateDetail(worksheet, {
+    this.generateDetail(worksheet, {
       column: 'A',
       columnTitle: 'Date',
       data: this.generateDate(dateNow),
@@ -141,13 +141,14 @@ export class ExportService {
     });
 
     // * Column Day
-    await this.generateDetail(worksheet, {
+    this.generateDetail(worksheet, {
       column: 'B',
       columnTitle: 'Day',
       data: this.generateDay(dateNow),
       isMerge: true,
     });
 
+    //#region Column Working Time from and to
     // * Column Working Time
     worksheet.mergeCells('C5:D5');
     worksheet.getCell('C5').value = 'Working Time';
@@ -190,6 +191,55 @@ export class ExportService {
       columnTitle: 'To',
       data: this.generateWorkingTimeTo(dateNow),
     });
+    //#endregion
+
+    //#region Column Overtime from and to
+    // * Column Overtime
+    worksheet.mergeCells('E5:F5');
+    worksheet.getCell('E5').value = 'Overtime';
+    this.style(worksheet, {
+      column: 'E5',
+      alignment: true,
+      font: true,
+      border: true,
+      bold: true,
+    });
+
+    worksheet.getCell('E6').value = 'From';
+    this.style(worksheet, {
+      column: 'E6',
+      alignment: true,
+      font: true,
+      border: true,
+      bold: true,
+    });
+
+    worksheet.getCell('F6').value = 'To';
+    this.style(worksheet, {
+      column: 'F6',
+      alignment: true,
+      font: true,
+      border: true,
+      bold: true,
+    });
+
+    // * Column from
+    this.generateDetail(worksheet, {
+      column: 'E',
+      columnTitle: 'From',
+      data: this.generateOvertime(dateNow),
+    });
+
+    // * Column to
+    this.generateDetail(worksheet, {
+      column: 'F',
+      columnTitle: 'To',
+      data: this.generateOvertime(dateNow),
+    });
+
+    //#endregion
+
+    //#endregion
 
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
@@ -284,6 +334,14 @@ export class ExportService {
     return day.map((o) => {
       if (o === 'Sat' || o === 'Sun') return '';
       return '17:00';
+    });
+  }
+
+  private generateOvertime(dateNow: Date): string[] {
+    const day = this.generateDay(dateNow);
+
+    return day.map((o) => {
+      return '';
     });
   }
 
