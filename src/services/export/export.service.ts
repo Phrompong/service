@@ -137,7 +137,7 @@ export class ExportService {
       column: 'A',
       columnTitle: 'Date',
       data: this.generateDate(dateNow),
-      isMerge: true,
+      isMergeHeader: true,
     });
 
     // * Column Day
@@ -145,7 +145,7 @@ export class ExportService {
       column: 'B',
       columnTitle: 'Day',
       data: this.generateDay(dateNow),
-      isMerge: true,
+      isMergeHeader: true,
     });
 
     //#region Column Working Time from and to
@@ -335,7 +335,7 @@ export class ExportService {
       column?: string;
       columnTitle: string;
       data: any[];
-      isMerge?: boolean;
+      isMergeHeader?: boolean;
       isBgColor?: boolean;
       columnForm?: string;
       columnTo?: string;
@@ -346,14 +346,14 @@ export class ExportService {
       column,
       columnTitle,
       data,
-      isMerge,
+      isMergeHeader,
       isBgColor,
       isMergeDetail,
       columnForm,
       columnTo,
     } = setting;
 
-    if (isMerge == true) {
+    if (isMergeHeader == true) {
       worksheet.mergeCells(`${column}5:${column}6`);
       worksheet.getCell(`${column}5`).value = columnTitle;
       worksheet.getCell(`${column}5`).alignment = {
@@ -374,59 +374,38 @@ export class ExportService {
 
     let index = 0;
     for (let i = 7; i <= 6 + data.length; i++) {
+      let v: string = column
+        ? `${column}${i}`
+        : `${columnForm}${i}:${columnTo}${i}`;
+
       if (isMergeDetail === true) {
-        worksheet.mergeCells(`${columnForm}${i}:${columnTo}${i}`);
-        worksheet.getCell(`${columnForm}${i}:${columnTo}${i}`).border = {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' },
+        worksheet.mergeCells(v);
+      }
+
+      worksheet.getCell(v).border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+
+      worksheet.getCell(v).value = data[index++];
+
+      worksheet.getCell(v).font = {
+        size: 10,
+      };
+
+      worksheet.getCell(v).alignment = {
+        vertical: 'middle',
+        horizontal: 'center',
+      };
+
+      if (isBgColor) {
+        worksheet.getCell(v).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FF808080' },
         };
-
-        worksheet.getCell(`${columnForm}${i}`).value = data[index++];
-
-        worksheet.getCell(`${columnForm}${i}:${columnTo}${i}`).font = {
-          size: 10,
-        };
-
-        worksheet.getCell(`${columnForm}${i}:${columnTo}${i}`).alignment = {
-          vertical: 'middle',
-          horizontal: 'center',
-        };
-
-        if (isBgColor) {
-          worksheet.getCell(`${columnForm}${i}:${columnTo}${i}`).fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FF808080' },
-          };
-        }
-      } else {
-        worksheet.getCell(`${column}${i}`).border = {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' },
-        };
-
-        worksheet.getCell(`${column}${i}`).value = data[index++];
-
-        worksheet.getCell(`${column}${i}`).font = {
-          size: 10,
-        };
-
-        worksheet.getCell(`${column}${i}`).alignment = {
-          vertical: 'middle',
-          horizontal: 'center',
-        };
-
-        if (isBgColor) {
-          worksheet.getCell(`${column}${i}`).fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FF808080' },
-          };
-        }
       }
     }
 
