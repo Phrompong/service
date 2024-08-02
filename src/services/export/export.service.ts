@@ -318,7 +318,7 @@ export class ExportService {
       columnTo: 'L',
       isMergeDetail: true,
       columnTitle: 'Reasons',
-      data: this.generateDay(dateNow),
+      data: this.generateReasons(dateNow),
     });
 
     //#endregion
@@ -398,6 +398,7 @@ export class ExportService {
       worksheet.getCell(v).alignment = {
         vertical: 'middle',
         horizontal: 'center',
+        wrapText: true,
       };
 
       if (isBgColor) {
@@ -405,6 +406,16 @@ export class ExportService {
           type: 'pattern',
           pattern: 'solid',
           fgColor: { argb: 'FF808080' },
+        };
+      }
+
+      if (isMergeDetail === true) {
+        const numLines = worksheet.getCell(v).value.split('\n').length;
+        worksheet.getRow(i).height = numLines * 20;
+        worksheet.getCell(v).alignment = {
+          vertical: 'middle',
+          horizontal: 'left',
+          wrapText: true,
         };
       }
     }
@@ -453,6 +464,14 @@ export class ExportService {
 
     return day.map((o) => {
       return '';
+    });
+  }
+
+  private generateReasons(dateNow: Date): string[] {
+    const day = this.generateDay(dateNow);
+
+    return day.map((o) => {
+      return `บรรทัดที่ 1\nบรรทัดที่ 2\nnบรรทัดที่ 3\nบรรทัดที่ 4\nบรรทัดที่ 5`;
     });
   }
 
