@@ -302,6 +302,27 @@ export class ExportService {
     });
     //#endregion
 
+    //#region Column Reasons
+    worksheet.mergeCells('J5:L6');
+    worksheet.getCell('J5').value = 'Reasons';
+    this.style(worksheet, {
+      column: 'J5',
+      alignment: true,
+      font: true,
+      border: true,
+      bold: true,
+    });
+
+    this.generateDetail(worksheet, {
+      columnForm: 'J',
+      columnTo: 'L',
+      isMergeDetail: true,
+      columnTitle: 'Reasons',
+      data: this.generateDay(dateNow),
+    });
+
+    //#endregion
+
     //#endregion
 
     const buffer = await workbook.xlsx.writeBuffer();
@@ -311,16 +332,26 @@ export class ExportService {
   private async generateDetail(
     worksheet: any,
     setting: {
-      column: string;
+      column?: string;
       columnTitle: string;
       data: any[];
       isMerge?: boolean;
       isBgColor?: boolean;
+      columnForm?: string;
+      columnTo?: string;
+      isMergeDetail?: boolean;
     },
   ): Promise<Worksheet> {
-    const { column, columnTitle, data, isMerge, isBgColor } = setting;
-
-    if (!column || !data) throw new Error('Invalid column or data');
+    const {
+      column,
+      columnTitle,
+      data,
+      isMerge,
+      isBgColor,
+      isMergeDetail,
+      columnForm,
+      columnTo,
+    } = setting;
 
     if (isMerge == true) {
       worksheet.mergeCells(`${column}5:${column}6`);
@@ -343,30 +374,59 @@ export class ExportService {
 
     let index = 0;
     for (let i = 7; i <= 6 + data.length; i++) {
-      worksheet.getCell(`${column}${i}`).border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' },
-      };
-
-      worksheet.getCell(`${column}${i}`).value = data[index++];
-
-      worksheet.getCell(`${column}${i}`).font = {
-        size: 10,
-      };
-
-      worksheet.getCell(`${column}${i}`).alignment = {
-        vertical: 'middle',
-        horizontal: 'center',
-      };
-
-      if (isBgColor) {
-        worksheet.getCell(`${column}${i}`).fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FF808080' },
+      if (isMergeDetail === true) {
+        worksheet.mergeCells(`${columnForm}${i}:${columnTo}${i}`);
+        worksheet.getCell(`${columnForm}${i}:${columnTo}${i}`).border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
         };
+
+        worksheet.getCell(`${columnForm}${i}`).value = data[index++];
+
+        worksheet.getCell(`${columnForm}${i}:${columnTo}${i}`).font = {
+          size: 10,
+        };
+
+        worksheet.getCell(`${columnForm}${i}:${columnTo}${i}`).alignment = {
+          vertical: 'middle',
+          horizontal: 'center',
+        };
+
+        if (isBgColor) {
+          worksheet.getCell(`${columnForm}${i}:${columnTo}${i}`).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF808080' },
+          };
+        }
+      } else {
+        worksheet.getCell(`${column}${i}`).border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+
+        worksheet.getCell(`${column}${i}`).value = data[index++];
+
+        worksheet.getCell(`${column}${i}`).font = {
+          size: 10,
+        };
+
+        worksheet.getCell(`${column}${i}`).alignment = {
+          vertical: 'middle',
+          horizontal: 'center',
+        };
+
+        if (isBgColor) {
+          worksheet.getCell(`${column}${i}`).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF808080' },
+          };
+        }
       }
     }
 
