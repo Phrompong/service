@@ -325,6 +325,42 @@ export class ExportService {
 
     //#endregion
 
+    //#region Total
+    const dateOfMonth = this.generateDay(dateNow);
+    const totalRow = dateOfMonth.length + 7;
+
+    worksheet.mergeCells(`A${totalRow}:F${totalRow}`);
+    worksheet.getCell(`A${totalRow}`).value = 'Total';
+    this.style(worksheet, {
+      column: `A${totalRow}:F${totalRow}`,
+      border: true,
+      alignment: true,
+      alignmentStyle: {
+        vertical: 'middle',
+      },
+    });
+
+    for (const column of ['G', 'H', 'I']) {
+      this.style(worksheet, {
+        column: `${column}${totalRow}`,
+        border: true,
+      });
+    }
+
+    worksheet.mergeCells(`J${totalRow}:L${totalRow}`);
+    worksheet.getCell(`J${totalRow}`).value = dateOfMonth.filter(
+      (o) => o !== 'Sat' && o !== 'Sun',
+    ).length;
+    this.style(worksheet, {
+      column: `J${totalRow}`,
+      border: true,
+      alignment: true,
+    });
+    worksheet.getRow(totalRow).height = 30;
+    //#endregion
+
+    //#region Signature
+    //#endregion
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
   }
@@ -471,6 +507,7 @@ export class ExportService {
     const day = this.generateDay(dateNow);
 
     return day.map((o) => {
+      if (o === 'Sat' || o === 'Sun') return '';
       return `บรรทัดที่ 1\nบรรทัดที่ 2\nnบรรทัดที่ 3\nบรรทัดที่ 4\nบรรทัดที่ 5`;
     });
   }
@@ -483,9 +520,10 @@ export class ExportService {
       border?: boolean;
       font?: boolean;
       alignment?: boolean;
+      alignmentStyle?: any;
     },
   ) {
-    const { bold, border, font, alignment, column } = setting;
+    const { bold, border, font, alignment, column, alignmentStyle } = setting;
 
     if (border) {
       worksheet.getCell(column).border = {
@@ -505,10 +543,12 @@ export class ExportService {
     }
 
     if (alignment) {
-      worksheet.getCell(column).alignment = {
-        vertical: 'middle',
-        horizontal: 'center',
-      };
+      worksheet.getCell(column).alignment = alignmentStyle
+        ? alignmentStyle
+        : {
+            vertical: 'middle',
+            horizontal: 'center',
+          };
     }
   }
 }
