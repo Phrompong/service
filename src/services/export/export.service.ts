@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Font, Workbook, Worksheet } from 'exceljs';
+import { Workbook, Worksheet } from 'exceljs';
 import { startOfMonth, endOfMonth, eachDayOfInterval, format } from 'date-fns';
 
 @Injectable()
@@ -362,7 +362,17 @@ export class ExportService {
     //#region Signature
     const signatureRow = dateOfMonth.length + 8;
     worksheet.mergeCells(`A${signatureRow}:I${signatureRow}`);
-    worksheet.getCell(`A${signatureRow}`).value = 'Signature';
+    // worksheet.getCell(`A${signatureRow}`).value = 'Signature';
+    const imageId = workbook.addImage({
+      filename: 'src/services/export/images/signature.png',
+      extension: 'png',
+    });
+
+    worksheet.addImage(imageId, {
+      tl: { col: 3, row: signatureRow - 0.5 },
+      ext: { width: 300, height: 80 },
+      editAs: 'oneCell',
+    });
     this.style(worksheet, {
       column: `A${signatureRow}:I${signatureRow}`,
       border: true,
@@ -386,6 +396,7 @@ export class ExportService {
 
     worksheet.getRow(signatureRow).height = 100;
     //#endregion
+
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
   }
