@@ -132,6 +132,7 @@ export class ExportService {
 
     //#region Table detail
 
+    worksheet.getRow(5).height = 50;
     // * Column Date
     this.generateDetail(worksheet, {
       column: 'A',
@@ -158,6 +159,7 @@ export class ExportService {
       font: true,
       border: true,
       bold: true,
+      italic: true,
     });
 
     worksheet.getCell('C6').value = 'From';
@@ -167,6 +169,7 @@ export class ExportService {
       font: true,
       border: true,
       bold: true,
+      italic: true,
     });
 
     worksheet.getCell('D6').value = 'To';
@@ -176,6 +179,7 @@ export class ExportService {
       font: true,
       border: true,
       bold: true,
+      italic: true,
     });
 
     // * Column from
@@ -203,6 +207,7 @@ export class ExportService {
       font: true,
       border: true,
       bold: true,
+      italic: true,
     });
 
     worksheet.getCell('E6').value = 'From';
@@ -212,6 +217,7 @@ export class ExportService {
       font: true,
       border: true,
       bold: true,
+      italic: true,
     });
 
     worksheet.getCell('F6').value = 'To';
@@ -221,6 +227,7 @@ export class ExportService {
       font: true,
       border: true,
       bold: true,
+      italic: true,
     });
 
     // * Column from
@@ -248,6 +255,7 @@ export class ExportService {
       font: true,
       border: true,
       bold: true,
+      italic: true,
     });
 
     worksheet.getCell('G6').value = '1';
@@ -257,6 +265,7 @@ export class ExportService {
       font: true,
       border: true,
       bold: true,
+      italic: true,
     });
 
     worksheet.getCell('H6').value = '1.5';
@@ -266,6 +275,7 @@ export class ExportService {
       font: true,
       border: true,
       bold: true,
+      italic: true,
     });
 
     worksheet.getCell('I6').value = '3';
@@ -275,6 +285,7 @@ export class ExportService {
       font: true,
       border: true,
       bold: true,
+      italic: true,
     });
 
     // * Column 1
@@ -311,6 +322,7 @@ export class ExportService {
       font: true,
       border: true,
       bold: true,
+      italic: true,
     });
 
     this.generateDetail(worksheet, {
@@ -415,6 +427,30 @@ export class ExportService {
       border: true,
       alignment: true,
     });
+    worksheet.getRow(detailSignatureRow).height = 50;
+    //#endregion
+
+    //#region Date
+    const dateRow = dateOfMonth.length + 10;
+    worksheet.mergeCells(`A${dateRow}:I${dateRow}`);
+    worksheet.getCell(`A${dateRow}`).value =
+      `Date: ${format(dateNow, 'dd-MMMM-yyyy')}`;
+    this.style(worksheet, {
+      column: `A${dateRow}:I${dateRow}`,
+      border: true,
+      alignment: true,
+    });
+
+    worksheet.mergeCells(`J${dateRow}:L${dateRow}`);
+    worksheet.getCell(`J${dateRow}`).value =
+      `Date: ${format(dateNow, 'dd-MMMM-yyyy')}`;
+    this.style(worksheet, {
+      column: `J${dateRow}:L${dateRow}`,
+      border: true,
+      alignment: true,
+    });
+
+    worksheet.getRow(dateRow).height = 100;
     //#endregion
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
@@ -454,6 +490,7 @@ export class ExportService {
       worksheet.getCell(`${column}5`).font = {
         size: 12,
         bold: true,
+        italic: true,
       };
       worksheet.getCell(`$${column}5`).border = {
         top: { style: 'thin' },
@@ -580,9 +617,11 @@ export class ExportService {
       font?: boolean;
       alignment?: boolean;
       alignmentStyle?: any;
+      italic?: boolean;
     },
   ) {
-    const { bold, border, font, alignment, column, alignmentStyle } = setting;
+    const { bold, border, font, alignment, column, alignmentStyle, italic } =
+      setting;
 
     if (border) {
       worksheet.getCell(column).border = {
@@ -598,6 +637,7 @@ export class ExportService {
         name: 'Arial',
         size: 12,
         bold: bold,
+        italic: italic,
       };
     }
 
