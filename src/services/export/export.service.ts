@@ -360,6 +360,31 @@ export class ExportService {
     //#endregion
 
     //#region Signature
+    const signatureRow = dateOfMonth.length + 8;
+    worksheet.mergeCells(`A${signatureRow}:I${signatureRow}`);
+    worksheet.getCell(`A${signatureRow}`).value = 'Signature';
+    this.style(worksheet, {
+      column: `A${signatureRow}:I${signatureRow}`,
+      border: true,
+      alignment: true,
+      alignmentStyle: {
+        vertical: 'middle',
+        horizontal: 'center',
+      },
+    });
+
+    worksheet.mergeCells(`J${signatureRow}:L${signatureRow}`);
+    this.style(worksheet, {
+      column: `J${signatureRow}:L${signatureRow}`,
+      border: true,
+      alignment: true,
+      alignmentStyle: {
+        vertical: 'middle',
+        horizontal: 'center',
+      },
+    });
+
+    worksheet.getRow(signatureRow).height = 100;
     //#endregion
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
