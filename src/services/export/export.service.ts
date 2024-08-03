@@ -7,6 +7,7 @@ export class ExportService {
   constructor() {}
 
   async timeSheet(): Promise<any> {
+    const dateNow = new Date();
     const workbook = new Workbook();
     let worksheet = workbook.addWorksheet('TimeSheet');
 
@@ -47,7 +48,7 @@ export class ExportService {
           font: { bold: true },
         },
         {
-          text: 'Senior Full Stack Developer',
+          text: 'Senior Developer',
           font: {
             underline: 'single',
           },
@@ -113,7 +114,7 @@ export class ExportService {
           font: { name: fontNamePI, bold: true, size: fontSizePI },
         },
         {
-          text: '01/07/2024 - 31/07/2024',
+          text: this.generatePeriod(dateNow),
           font: {
             name: fontNamePI,
             underline: 'single',
@@ -130,7 +131,6 @@ export class ExportService {
     //#endregion
 
     //#region Table detail
-    const dateNow = new Date();
 
     // * Column Date
     this.generateDetail(worksheet, {
@@ -546,6 +546,10 @@ export class ExportService {
       if (o === 'Sat' || o === 'Sun') return '';
       return `บรรทัดที่ 1\nบรรทัดที่ 2\nnบรรทัดที่ 3\nบรรทัดที่ 4\nบรรทัดที่ 5`;
     });
+  }
+
+  private generatePeriod(dateNow: Date): string {
+    return `${format(startOfMonth(dateNow), 'dd/MM/yyyy')} - ${format(endOfMonth(dateNow), 'dd/MM/yyyy')}`;
   }
 
   private style(
