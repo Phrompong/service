@@ -397,6 +397,25 @@ export class ExportService {
     worksheet.getRow(signatureRow).height = 100;
     //#endregion
 
+    //#region Detail Signature
+    const detailSignatureRow = dateOfMonth.length + 9;
+    worksheet.mergeCells(`A${detailSignatureRow}:I${detailSignatureRow}`);
+    worksheet.getCell(`A${detailSignatureRow}`).value = "Employee's Signature";
+    this.style(worksheet, {
+      column: `A${detailSignatureRow}:I${detailSignatureRow}`,
+      border: true,
+      alignment: true,
+    });
+
+    worksheet.mergeCells(`J${detailSignatureRow}:L${detailSignatureRow}`);
+    worksheet.getCell(`J${detailSignatureRow}`).value =
+      "Team Lead/ Head's Signature";
+    this.style(worksheet, {
+      column: `J${detailSignatureRow}:L${detailSignatureRow}`,
+      border: true,
+      alignment: true,
+    });
+    //#endregion
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
   }
