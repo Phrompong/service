@@ -368,9 +368,15 @@ export class ExportService {
     }
 
     worksheet.mergeCells(`J${totalRow}:L${totalRow}`);
-    worksheet.getCell(`J${totalRow}`).value = dateOfMonth.filter(
-      (o) => o !== 'Sat' && o !== 'Sun',
+
+    // * Calculate working day
+    const countWorkingDay = dateOfMonth.filter(
+      (o) => o !== 'Sat' && o !== 'Sun' && o !== 'Holiday',
     ).length;
+
+    const countHoliday = configHoliday().length;
+
+    worksheet.getCell(`J${totalRow}`).value = countWorkingDay - countHoliday;
     this.style(worksheet, {
       column: `J${totalRow}`,
       border: true,
