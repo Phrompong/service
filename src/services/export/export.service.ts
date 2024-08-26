@@ -635,9 +635,13 @@ export class ExportService {
       return { dayOfText, detail };
     });
 
+    const holiday = configHoliday();
+
     return dayNum.map((o) => {
       const text = mutateText.find((m) => m.dayOfText === o.toString());
       if (text) return text.detail;
+
+      if (holiday.includes(o)) return 'Holiday';
       return '';
     });
   }
