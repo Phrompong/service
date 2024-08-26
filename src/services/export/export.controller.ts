@@ -1,4 +1,4 @@
-import { Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ExportService } from './export.service';
 import { Response } from 'express';
@@ -9,8 +9,8 @@ export class ExportController {
   constructor(private readonly exportService: ExportService) {}
 
   @Post('/timeSheet')
-  async timeSheet(@Res() res: Response) {
-    const buffer = await this.exportService.timeSheet();
+  async timeSheet(@Res() res: Response, @Body() body: any) {
+    const buffer = await this.exportService.timeSheet(body);
 
     res.set({
       'Content-Type':

@@ -1,12 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { Workbook, Worksheet } from 'exceljs';
 import { startOfMonth, endOfMonth, eachDayOfInterval, format } from 'date-fns';
+import { configHoliday } from './export.util';
 
 @Injectable()
 export class ExportService {
   constructor() {}
 
-  async timeSheet(): Promise<any> {
+  async timeSheet(param: {
+    position: string;
+    firstName: string;
+    lastName: string;
+    reasons: string[];
+  }): Promise<any> {
+    const { position, firstName, lastName, reasons } = param;
+
     const dateNow = new Date();
     const workbook = new Workbook();
     let worksheet = workbook.addWorksheet('TimeSheet');
@@ -38,7 +46,7 @@ export class ExportService {
           font: { name: 'Century Gothic', bold: true, size: fontSizePI },
         },
         {
-          text: 'Phrompong Khagtes    ',
+          text: `${firstName} ${lastName}     `,
           font: {
             underline: 'single',
           },
@@ -48,7 +56,7 @@ export class ExportService {
           font: { bold: true },
         },
         {
-          text: 'Senior Developer',
+          text: `${position}`,
           font: {
             underline: 'single',
           },
@@ -330,7 +338,7 @@ export class ExportService {
       columnTo: 'L',
       isMergeDetail: true,
       columnTitle: 'Reasons',
-      data: this.generateReasons(dateNow),
+      data: this.generateReasons(dateNow, reasons),
     });
 
     //#endregion
@@ -566,23 +574,45 @@ export class ExportService {
       end: endOfMonth(dateNow),
     });
 
-    return daysOfWeek.map((day) => format(day, 'EEE'));
+    return daysOfWeek.map((day) => {
+      return format(day, 'EEE');
+    });
   }
 
   private generateWorkingTimeForm(dateNow: Date): string[] {
-    const day = this.generateDay(dateNow);
+    const daysOfWeek = eachDayOfInterval({
+      start: startOfMonth(dateNow),
+      end: endOfMonth(dateNow),
+    });
 
-    return day.map((o) => {
-      if (o === 'Sat' || o === 'Sun') return '';
+    const holiday = configHoliday();
+
+    return daysOfWeek.map((o) => {
+      const day = format(o, 'EEE');
+
+      if (day === 'Sat' || day === 'Sun' || holiday.includes(o.getDate())) {
+        return '';
+      }
+
       return '08:00';
     });
   }
 
   private generateWorkingTimeTo(dateNow: Date): string[] {
-    const day = this.generateDay(dateNow);
+    const daysOfWeek = eachDayOfInterval({
+      start: startOfMonth(dateNow),
+      end: endOfMonth(dateNow),
+    });
 
-    return day.map((o) => {
-      if (o === 'Sat' || o === 'Sun') return '';
+    const holiday = configHoliday();
+
+    return daysOfWeek.map((o) => {
+      const day = format(o, 'EEE');
+
+      if (day === 'Sat' || day === 'Sun' || holiday.includes(o.getDate())) {
+        return '';
+      }
+
       return '17:00';
     });
   }
@@ -595,12 +625,20 @@ export class ExportService {
     });
   }
 
-  private generateReasons(dateNow: Date): string[] {
-    const day = this.generateDay(dateNow);
+  private generateReasons(dateNow: Date, reasons: string[]): string[] {
+    const dayNum = this.generateDate(dateNow);
 
-    return day.map((o) => {
-      if (o === 'Sat' || o === 'Sun') return '';
-      return `บรรทัดที่ 1\nบรรทัดที่ 2\nnบรรทัดที่ 3\nบรรทัดที่ 4\nบรรทัดที่ 5`;
+    const mutateText = reasons.map((o) => {
+      const dayOfText = o.substring(0, o.indexOf(' '));
+      const detail = o.substring(o.indexOf(' ') + 1, o.length);
+
+      return { dayOfText, detail };
+    });
+
+    return dayNum.map((o) => {
+      const text = mutateText.find((m) => m.dayOfText === o.toString());
+      if (text) return text.detail;
+      return '';
     });
   }
 
